@@ -3,7 +3,6 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { OpenAPIObject } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import expressAuth from 'express-basic-auth';
-import handlebars from 'express-handlebars';
 import { create } from 'express-handlebars';
 import pathModule from 'path';
 import { resolve } from 'url';
@@ -22,11 +21,15 @@ export class RedocModule {
     path: string,
     app: INestApplication,
     document: OpenAPIObject,
-    options: RedocOptions
+    options: RedocOptions,
+    additionalProperties: Record<string, any>,
   ): Promise<void> {
     // Validate options object
     try {
-      const _options = await this.validateOptionsObject(options, document);
+      const _options = {
+        ...await this.validateOptionsObject(options, document),
+        ...additionalProperties
+      };
       const redocDocument = this.addVendorExtensions(
         _options,
         <RedocDocument>document
@@ -80,7 +83,7 @@ export class RedocModule {
     path: string,
     app: NestExpressApplication,
     document: RedocDocument,
-    options: RedocOptions
+    options: RedocOptions & Record<string, any>
   ) {
     const httpAdapter = app.getHttpAdapter();
     // Normalize URL path to use
@@ -169,7 +172,7 @@ export class RedocModule {
    * @param document redoc document
    */
   private static addVendorExtensions(
-    options: RedocOptions,
+    options: RedocOptions & Record<string, any>,
     document: RedocDocument
   ): RedocDocument {
     if (options.logo) {

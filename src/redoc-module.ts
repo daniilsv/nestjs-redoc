@@ -22,13 +22,13 @@ export class RedocModule {
     app: INestApplication,
     document: OpenAPIObject,
     options: RedocOptions,
-    additionalProperties: Record<string, any>,
+    additionalProperties: Record<string, any>
   ): Promise<void> {
     // Validate options object
     try {
       const _options = {
-        ...await this.validateOptionsObject(options, document),
-        ...additionalProperties
+        ...(await this.validateOptionsObject(options, document)),
+        ...additionalProperties,
       };
       const redocDocument = this.addVendorExtensions(
         _options,
